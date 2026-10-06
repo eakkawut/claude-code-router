@@ -356,11 +356,14 @@ test("Claude Code local provider reports a missing candidate when no keychain it
 async function withClaudeCodeHome(run) {
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-code-provider-"));
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   try {
     await run(home);
   } finally {
     restoreEnv("HOME", previousHome);
+    restoreEnv("USERPROFILE", previousUserProfile);
     rmSync(home, { force: true, recursive: true });
   }
 }

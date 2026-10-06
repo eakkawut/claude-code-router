@@ -383,11 +383,14 @@ function claudeCodeOauthProviderPlugin() {
 async function withClaudeCodeHome(run) {
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-code-hook-test-"));
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   try {
     await run(home);
   } finally {
     restoreEnv("HOME", previousHome);
+    restoreEnv("USERPROFILE", previousUserProfile);
     rmSync(home, { force: true, recursive: true });
   }
 }

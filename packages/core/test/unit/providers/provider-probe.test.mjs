@@ -386,10 +386,12 @@ test("connectivity probe applies provider plugin auth for local agent imports", 
 test("connectivity probe uses the live Claude Code OAuth token instead of the import snapshot", async (t) => {
   const previousFetch = globalThis.fetch;
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "ccr-probe-claude-code-"));
   const seen = [];
 
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   fs.mkdirSync(path.join(home, ".claude"), { recursive: true });
   fs.writeFileSync(path.join(home, ".claude", ".credentials.json"), JSON.stringify({
     accessToken: "rotated-live-access-token",
@@ -410,6 +412,11 @@ test("connectivity probe uses the live Claude Code OAuth token instead of the im
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
+    }
+    if (previousUserProfile === undefined) {
+      delete process.env.USERPROFILE;
+    } else {
+      process.env.USERPROFILE = previousUserProfile;
     }
     fs.rmSync(home, { force: true, recursive: true });
   });
@@ -449,10 +456,12 @@ test("connectivity probe uses the live Claude Code OAuth token instead of the im
 test("model discovery uses the live Claude Code OAuth token instead of the import snapshot", async (t) => {
   const previousFetch = globalThis.fetch;
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "ccr-probe-models-claude-code-"));
   const seen = [];
 
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   fs.mkdirSync(path.join(home, ".claude"), { recursive: true });
   fs.writeFileSync(path.join(home, ".claude", ".credentials.json"), JSON.stringify({
     accessToken: "rotated-models-access-token",
@@ -476,6 +485,11 @@ test("model discovery uses the live Claude Code OAuth token instead of the impor
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
+    }
+    if (previousUserProfile === undefined) {
+      delete process.env.USERPROFILE;
+    } else {
+      process.env.USERPROFILE = previousUserProfile;
     }
     fs.rmSync(home, { force: true, recursive: true });
   });
@@ -510,10 +524,12 @@ test("model discovery uses the live Claude Code OAuth token instead of the impor
 test("model discovery keeps an explicit API key when the probe is not local-login", async (t) => {
   const previousFetch = globalThis.fetch;
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "ccr-probe-models-api-key-"));
   const seen = [];
 
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   fs.mkdirSync(path.join(home, ".claude"), { recursive: true });
   fs.writeFileSync(path.join(home, ".claude", ".credentials.json"), JSON.stringify({
     accessToken: "rotated-live-access-token",
@@ -540,6 +556,11 @@ test("model discovery keeps an explicit API key when the probe is not local-logi
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
+    }
+    if (previousUserProfile === undefined) {
+      delete process.env.USERPROFILE;
+    } else {
+      process.env.USERPROFILE = previousUserProfile;
     }
     fs.rmSync(home, { force: true, recursive: true });
   });
@@ -572,10 +593,12 @@ test("model discovery keeps an explicit API key when the probe is not local-logi
 test("model discovery does not read Claude Code credentials without an OAuth import plugin", async (t) => {
   const previousFetch = globalThis.fetch;
   const previousHome = process.env.HOME;
+  const previousUserProfile = process.env.USERPROFILE;
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "ccr-probe-models-no-oauth-"));
   const seen = [];
 
   process.env.HOME = home;
+  process.env.USERPROFILE = home;
   fs.mkdirSync(path.join(home, ".claude"), { recursive: true });
   fs.writeFileSync(path.join(home, ".claude", ".credentials.json"), JSON.stringify({
     accessToken: "rotated-live-access-token",
@@ -599,6 +622,11 @@ test("model discovery does not read Claude Code credentials without an OAuth imp
       delete process.env.HOME;
     } else {
       process.env.HOME = previousHome;
+    }
+    if (previousUserProfile === undefined) {
+      delete process.env.USERPROFILE;
+    } else {
+      process.env.USERPROFILE = previousUserProfile;
     }
     fs.rmSync(home, { force: true, recursive: true });
   });
