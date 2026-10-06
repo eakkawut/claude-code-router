@@ -1,4 +1,4 @@
-import { readClaudeCodeOauth, readGrokAuth, readKimiAuth, resolveGrokAuth, resolveKimiAuth } from "@ccr/core/agents/local-providers/service";
+import { readLiveClaudeCodeOauth, readGrokAuth, readKimiAuth, resolveGrokAuth, resolveKimiAuth } from "@ccr/core/agents/local-providers/service";
 import { applyOpenCodePublicFreeTierHeaders, isOpenCodePublicFreeTierPlugin, withOpenCodePublicFreeTierTools } from "@ccr/core/agents/local-providers/opencode-freetier";
 import { grokAccessTokenExpired, grokClientVersion } from "@ccr/core/agents/local-providers/grok";
 import { kimiAccessTokenExpired, kimiIdentityHeaders } from "@ccr/core/agents/local-providers/kimi";
@@ -8,6 +8,9 @@ import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
 import { mergeAnthropicBetaValues } from "@ccr/core/providers/oauth-plugin";
 
 const configProviderPluginKeyPrefix = "config:";
+// Distinct from ai-gateway's configured plugin prefix (`config:`) so the live
+// re-read hook is never overwritten by the static providerPlugins registration.
+const liveProviderPluginKeyPrefix = "module:";
 const localAgentProviderPluginKeyPrefix = "ccr-local-agent-";
 
 type HeaderRecord = Record<string, string>;
@@ -90,7 +93,7 @@ function localAgentOauthProviderHook(plugin: unknown): ProviderHook | undefined 
   }
 
   const hook: ProviderHook = {
-    key: `${configProviderPluginKeyPrefix}${key}`,
+    key: `${liveProviderPluginKeyPrefix}${key}`,
     provider: stringValue(plugin.provider),
     providerName: stringValue(plugin.providerName)
   };
@@ -151,7 +154,7 @@ async function authenticateClaudeCode(
   input: ProviderPluginInput,
   plugin: Record<string, unknown>
 ): Promise<ProviderHookResult> {
-  const token = readClaudeCodeOauth()?.accessToken || originalBearerToken(plugin);
+  const token = readLiveClaudeCodeOauth()?.accessToken || originalBearerToken(plugin);
   if (!token) {
     return { error: "Claude Code access token was not found.", ok: false };
   }

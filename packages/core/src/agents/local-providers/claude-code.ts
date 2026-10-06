@@ -187,6 +187,23 @@ export function readClaudeCodeOauth(): OAuthTokenSet | undefined {
   return scanClaudeCodeLogin().oauth;
 }
 
+// Keychain reads shell out to `security` synchronously, so per-request callers
+// reuse a recent keychain token briefly. File-backed tokens (Windows/Linux)
+// are cheap to re-read and are never cached.
+const liveKeychainOauthTtlMs = 15_000;
+let liveKeychainOauthCache: { expiresAt: number; oauth: OAuthTokenSet } | undefined;
+
+export function readLiveClaudeCodeOauth(): OAuthTokenSet | undefined {
+  if (liveKeychainOauthCache && liveKeychainOauthCache.expiresAt > Date.now()) {
+    return liveKeychainOauthCache.oauth;
+  }
+  const oauth = readClaudeCodeOauth();
+  liveKeychainOauthCache = oauth?.accessToken && oauth.sourceFile?.startsWith("keychain:")
+    ? { expiresAt: Date.now() + liveKeychainOauthTtlMs, oauth }
+    : undefined;
+  return oauth;
+}
+
 export function scanClaudeCodeLogin(): ClaudeCodeLoginScan {
   const scan: ClaudeCodeLoginScan = { errors: [], inspected: [], tokenless: [] };
   const keychainOauth = scanClaudeCodeKeychain(scan);
